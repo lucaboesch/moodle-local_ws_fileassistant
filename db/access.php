@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
 
-    'local/ws_fileassistant:local/ws_fileassistant:managefiles' => [
+    'local/ws_fileassistant:managefiles' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => [

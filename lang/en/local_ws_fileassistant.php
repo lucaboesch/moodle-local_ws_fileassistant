@@ -26,4 +26,4 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'File assistant web service';
-$string['ws_fileassistant:local/ws_fileassistant:managefiles'] = 'Manage files using the Fileassistant Web Service';
+$string['local/ws_fileassistant:managefiles'] = 'Manage files using the Fileassistant Web Service';
