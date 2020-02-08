@@ -1,4 +1,6 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -20,13 +22,16 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 // We defined the web service functions to install.
 $functions = array(
     'local_ws_fileassistant_create_file_resource' => array(
         'classname'   => 'local_ws_fileassistant_external',
         'methodname'  => 'create_file_resource',
         'classpath'   => 'local/ws_fileassistant/externallib.php',
-        'description' => 'Return Hello World FIRSTNAME. Can change the text (Hello World) sending a new text as parameter',
+        'description' => 'Allows to create file resources in sections of a Moodle course with files in the \'Private files\' ' .
+                         'area, and other things, too',
         'type'        => 'write',
     )
 );
@@ -36,6 +41,6 @@ $services = array(
     'Create a file resource' => array(
         'functions' => array ('local_ws_fileassistant_create_file_resource'),
         'restrictedusers' => 0,
-        'enabled'=>1,
+        'enabled' => 1,
     )
 );
