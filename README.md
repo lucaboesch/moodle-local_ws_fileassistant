@@ -7,6 +7,12 @@ Since this functionality is missing but would be greatly appreciated by lecturer
 lecture materials to their courses using the command line, here's a way to make this possible. Note this does not provide the
 CLI commands, it does, however, allow files to be pushed into a section of a course.
 
+# Usage #
+
+Given a file exists in a user's "Private files", e.g. pdf1.pdf, the user is able to push it to a Moodle course by the CLI command
+
+`curl "http://<host>/webservice/rest/server.php?wstoken=<token>&wsfunction=local_ws_fileassistant_create_file_resource&filename=pdf1.pdf"`
+
 ## License ##
 
 2020 Nina Herrmann <nina.herrmann@uni-muenster.de> Luca Bösch <luca.boesch@bfh.ch>

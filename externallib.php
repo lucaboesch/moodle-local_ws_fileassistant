@@ -24,7 +24,11 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->libdir . "/externallib.php");
+require_once($CFG->libdir . '/externallib.php');
+require_once($CFG->libdir . '/completionlib.php');
+require_once($CFG->dirroot. '/course/modlib.php');
+require_once($CFG->dirroot . '/mod/resource/lib.php');
+require_once($CFG->dirroot . '/mod/resource/locallib.php');
 
 /**
  * Class local_ws_fileassistant_external
@@ -49,7 +53,7 @@ class local_ws_fileassistant_external extends external_api {
      * @return array $results The array of results.
      */
     public static function create_file_resource($filename) {
-        global $USER;
+        global $USER, $DB;
 
         // Parameter validation.
         // REQUIRED.
@@ -57,7 +61,7 @@ class local_ws_fileassistant_external extends external_api {
             array('filename' => $filename));
 
         // For sure: filename courseid sectionnumber action.
-        // Maybe: alias display intro printintro popupwidth popupheight showsize showtype showdate.
+        // Maybe: alias displayname display intro printintro popupwidth popupheight showsize showtype showdate.
 
         // Context validation.
         $context = \context_user::instance($USER->id);
@@ -69,7 +73,61 @@ class local_ws_fileassistant_external extends external_api {
             throw new moodle_exception('cannotviewprofile');
         }
 
-        return $params['filename'] . $USER->firstname;
+        $browser = get_file_browser();
+
+        $component = "user";
+        $filearea = "private";
+        $itemid = 0;
+        $filepath = "/";
+        $filename = "test.pdf";
+
+        $data = new stdClass();
+
+        if ($fileinfo = $browser->get_file_info($context, $component, $filearea, $itemid, $filepath, $filename)) {
+            $data->files = $fileinfo->itemid; // Itemid of the file.
+        }
+
+        file_put_contents('/Users/luca/Desktop/log2.txt', json_encode($context) . $component . $filearea . $itemid . $filepath . $filename);
+        file_put_contents('/Users/luca/Desktop/log1.txt', json_encode($fileinfo));
+
+        $data->name = 'foo.pdf'; // Displayed name.
+        $data->showdescription = 0; // Whether to show the description.
+        $data->files = $fileinfo->itemid; // Itemid of the file.
+        $data->visible = 1; //
+        $data->visibleoncoursepage = 1; //
+        $data->course = '5'; //
+        $data->coursemodule = 83;
+        $data->section = 1;
+        $mod = $DB->get_record('modules', ['name' => 'resource']);
+        $data->module = $mod->id; // Id the module of name 'resource' has.
+        $data->modulename = 'resource';
+        $data->instance = '';
+        $data->add = 'resource';
+        $data->intro = '';
+        $data->introformat = FORMAT_HTML;
+        $data->completion = 0;
+
+        // Set the display options to the site defaults.
+        $config = get_config('resource');
+        $data->display = $config->display;
+        $data->popupheight = $config->popupheight;
+        $data->popupwidth = $config->popupwidth;
+        $data->printintro = $config->printintro;
+        $data->showsize = (isset($config->showsize)) ? $config->showsize : 0;
+        $data->showtype = (isset($config->showtype)) ? $config->showtype : 0;
+        $data->showdate = (isset($config->showdate)) ? $config->showdate : 0;
+        $data->filterfiles = $config->filterfiles;
+        $data->timemodified = time();
+
+        file_put_contents('/Users/luca/Desktop/log0.txt', json_encode($data));
+
+        $course = get_course(5);
+
+        // Add a file.
+        $moduleinfo = add_moduleinfo($data, $course);
+
+        return 'Added file ' . $params['filename'] . ' by user ' . $USER->firstname . ' now having resource id ' .
+            $moduleinfo->id . '.';
     }
 
     /**
