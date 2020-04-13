@@ -11,7 +11,9 @@ CLI commands, it does, however, allow files to be pushed into a section of a cou
 
 Given a file exists in a user's "Private files", e.g. pdf1.pdf, the user is able to push it to a Moodle course by the CLI command
 
-`curl "http://<host>/webservice/rest/server.php?wstoken=<token>&wsfunction=local_ws_fileassistant_create_file_resource&filename=pdf1.pdf&courseid=5"`
+`curl "http://<host>/webservice/rest/server.php?wstoken=<token>&wsfunction=local_ws_fileassistant_create_file_resource&filename=pdf1.pdf&courseid=5&sectionnumber=2&displayname=file.pdf"`
+
+The token has first to be taken from Dashboard → Preferences → User account → Security keys.
 
 ## License ##
 

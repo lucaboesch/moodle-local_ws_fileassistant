@@ -44,7 +44,9 @@ class local_ws_fileassistant_external extends external_api {
             array('filename' => new external_value(PARAM_TEXT, 'A file in a user\'s \'private files\', ' .
                   'default in / when no filepath provided', VALUE_REQUIRED),
                   'filepath' => new external_value(PARAM_TEXT, 'A path to a file in a user\'s \'private files\'', VALUE_OPTIONAL),
-                  'courseid' => new external_value(PARAM_INT, 'The course id the file is to be handeled in', VALUE_REQUIRED)
+                  'courseid' => new external_value(PARAM_INT, 'The course id the file is to be handeled in', VALUE_REQUIRED),
+                  'sectionnumber' => new external_value(PARAM_INT, 'In which section the file is to be added', VALUE_REQUIRED),
+                  'displayname' => new external_value(PARAM_TEXT, 'The name to display for the file', VALUE_OPTIONAL)
             )
         );
     }
@@ -55,9 +57,11 @@ class local_ws_fileassistant_external extends external_api {
      * @param string $filename file name
      * @param string $filepath file path
      * @param int $courseid course id
+     * @param int $sectionnumber section number
+     * @param string $displayname file display name
      * @return array $results The array of results.
      */
-    public static function create_file_resource($filename, $filepath, $courseid) {
+    public static function create_file_resource($filename, $filepath, $courseid, $sectionnumber, $displayname) {
         global $USER, $DB;
 
         // Parameter validation.
@@ -65,7 +69,9 @@ class local_ws_fileassistant_external extends external_api {
         $params = self::validate_parameters(self::create_file_resource_parameters(),
             array('filename' => $filename,
                 'filepath' => $filepath,
-                'courseid' => $courseid));
+                'courseid' => $courseid,
+                'sectionnumber' => $sectionnumber,
+                'displayname' => $displayname));
 
         // For sure: sectionnumber action.
         // Maybe: alias displayname display intro printintro popupwidth popupheight showsize showtype showdate.
@@ -99,15 +105,17 @@ class local_ws_fileassistant_external extends external_api {
             'filename' => $filename,
             'userid' => $USER->id
         ]);
-
-        $data->name = $filename; // Displayed name.
+        if ($displayname == '') {
+            $data->name = $filename; // Displayed name.
+        } else {
+            $data->name = $displayname; // Displayed name.
+        }
         $data->showdescription = 0; // Whether to show the description.
         $data->files = $itemid;
-        $data->visible = 1; //
-        $data->visibleoncoursepage = 1; //
+        $data->visible = 1;
+        $data->visibleoncoursepage = 1;
         $data->course = $courseid;
-//        $data->coursemodule = 83;
-        $data->section = 1;
+        $data->section = $sectionnumber;
         $mod = $DB->get_record('modules', ['name' => 'resource']);
         $data->module = $mod->id; // Id the module of name 'resource' has.
         $data->modulename = 'resource';
@@ -115,7 +123,6 @@ class local_ws_fileassistant_external extends external_api {
         $data->add = 'resource';
         $data->intro = '';
         $data->introformat = FORMAT_HTML;
-//        $data->completion = 0;
 
         // Set the display options to the site defaults.
         $config = get_config('resource');
@@ -134,8 +141,8 @@ class local_ws_fileassistant_external extends external_api {
         // Add a file.
         $moduleinfo = add_moduleinfo($data, $course);
 
-        return 'Added file ' . $filepath . $params['filename'] . ' by user ' . $USER->firstname . ' to course id ' . $courseid . ' now having resource id ' .
-            $moduleinfo->id . '.';
+        return 'Added file ' . $filepath . $params['filename'] . ' by user ' . fullname($USER) . ' to course id ' . $courseid .
+            ' in section ' . $sectionnumber. ' now having resource id ' . $moduleinfo->id . '.';
     }
 
     /**
