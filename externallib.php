@@ -42,7 +42,9 @@ class local_ws_fileassistant_external extends external_api {
     public static function create_file_resource_parameters() {
         return new external_function_parameters(
             array('filename' => new external_value(PARAM_TEXT, 'A path to a file in a user\'s \'private files\', ' .
-                  'including the path', VALUE_OPTIONAL))
+                  'including the path', VALUE_REQUIRED),
+                  'courseid' => new external_value(PARAM_INT, 'The course id the file is to be handeled in', VALUE_REQUIRED)
+            )
         );
     }
 
@@ -50,15 +52,16 @@ class local_ws_fileassistant_external extends external_api {
      * Assists with a file operation.
      *
      * @param string $filename file name including path
+     * @param int $courseid course id
      * @return array $results The array of results.
      */
-    public static function create_file_resource($filename) {
+    public static function create_file_resource($filename, $courseid) {
         global $USER, $DB;
 
         // Parameter validation.
         // REQUIRED.
         $params = self::validate_parameters(self::create_file_resource_parameters(),
-            array('filename' => $filename));
+            array('filename' => $filename, 'courseid' => $courseid));
 
         // For sure: filename courseid sectionnumber action.
         // Maybe: alias displayname display intro printintro popupwidth popupheight showsize showtype showdate.
@@ -73,29 +76,26 @@ class local_ws_fileassistant_external extends external_api {
             throw new moodle_exception('cannotviewprofile');
         }
 
-        $browser = get_file_browser();
-
         $component = "user";
-        $filearea = "private";
-        $itemid = 0;
+        $filearea = "draft";
         $filepath = "/";
-        $filename = "test.pdf";
 
         $data = new stdClass();
 
-        if ($fileinfo = $browser->get_file_info($context, $component, $filearea, $itemid, $filepath, $filename)) {
-            $data->files = $fileinfo->itemid; // Itemid of the file.
-        }
-
-        file_put_contents('/Users/luca/Desktop/log2.txt', json_encode($context) . $component . $filearea . $itemid . $filepath . $filename);
-        file_put_contents('/Users/luca/Desktop/log1.txt', json_encode($fileinfo));
+        $itemid = $DB->get_field('files', 'itemid', [
+            'component' => $component,
+            'filearea' => $filearea,
+            'filepath' => $filepath,
+            'filename' => $filename,
+            'userid' => $USER->id
+        ]);
 
         $data->name = 'foo.pdf'; // Displayed name.
         $data->showdescription = 0; // Whether to show the description.
-        $data->files = $fileinfo->itemid; // Itemid of the file.
+        $data->files = $itemid;
         $data->visible = 1; //
         $data->visibleoncoursepage = 1; //
-        $data->course = '5'; //
+        $data->course = $courseid;
         $data->coursemodule = 83;
         $data->section = 1;
         $mod = $DB->get_record('modules', ['name' => 'resource']);
@@ -119,14 +119,12 @@ class local_ws_fileassistant_external extends external_api {
         $data->filterfiles = $config->filterfiles;
         $data->timemodified = time();
 
-        file_put_contents('/Users/luca/Desktop/log0.txt', json_encode($data));
-
-        $course = get_course(5);
+        $course = get_course($courseid);
 
         // Add a file.
         $moduleinfo = add_moduleinfo($data, $course);
 
-        return 'Added file ' . $params['filename'] . ' by user ' . $USER->firstname . ' now having resource id ' .
+        return 'Added file ' . $params['filename'] . ' by user ' . $USER->firstname . ' to course id ' . $courseid . ' now having resource id ' .
             $moduleinfo->id . '.';
     }
 
