@@ -43,10 +43,10 @@ class local_ws_fileassistant_external extends external_api {
         return new external_function_parameters(
             array('filename' => new external_value(PARAM_TEXT, 'A file in a user\'s \'private files\', ' .
                   'default in / when no filepath provided', VALUE_REQUIRED),
-                  'filepath' => new external_value(PARAM_TEXT, 'A path to a file in a user\'s \'private files\'', VALUE_OPTIONAL),
+                  'filepath' => new external_value(PARAM_TEXT, 'A path to a file in a user\'s \'private files\'', VALUE_DEFAULT, '/'),
                   'courseid' => new external_value(PARAM_INT, 'The course id the file is to be handeled in', VALUE_REQUIRED),
                   'sectionnumber' => new external_value(PARAM_INT, 'In which section the file is to be added', VALUE_REQUIRED),
-                  'displayname' => new external_value(PARAM_TEXT, 'The name to display for the file', VALUE_OPTIONAL)
+                  'displayname' => new external_value(PARAM_TEXT, 'The name to display for the file', VALUE_DEFAULT, '')
             )
         );
     }
@@ -73,8 +73,8 @@ class local_ws_fileassistant_external extends external_api {
                 'sectionnumber' => $sectionnumber,
                 'displayname' => $displayname));
 
-        // For sure: sectionnumber action.
-        // Maybe: alias displayname display intro printintro popupwidth popupheight showsize showtype showdate.
+        // For sure: action.
+        // Maybe: alias display intro printintro popupwidth popupheight showsize showtype showdate.
 
         // Context validation.
         $context = \context_user::instance($USER->id);
