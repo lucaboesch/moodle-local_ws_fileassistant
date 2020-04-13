@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_ws_fileassistant';
-$plugin->release = '0.1.0';
-$plugin->version = 2020020600;
+$plugin->release = '0.2.0';
+$plugin->version = 2020041300;
 $plugin->requires = 2018120300;
 $plugin->maturity = MATURITY_ALPHA;
