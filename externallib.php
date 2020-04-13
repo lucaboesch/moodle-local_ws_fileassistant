@@ -79,6 +79,10 @@ class local_ws_fileassistant_external extends external_api {
         if (!has_capability('repository/user:view', $context)) {
             throw new moodle_exception('cannotviewprofile');
         }
+        $coursecontext = \context_course::instance($courseid);
+        if (!has_capability('moodle/course:manageactivities', $coursecontext)) {
+            throw new moodle_exception('cannotaddcoursemodule');
+        }
 
         $component = "user";
         $filearea = "draft";
