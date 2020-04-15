@@ -29,6 +29,9 @@ require_once($CFG->libdir . '/filelib.php');
 require_once($CFG->dirroot . '/webservice/tests/helpers.php');
 require_once($CFG->dirroot . '/local/ws_fileassistant/externallib.php');
 
+/**
+ * Class local_fileassistant_testcase
+ */
 class local_fileassistant_testcase  extends advanced_testcase {
     /**
      * Helper function to create draft files
