@@ -7,6 +7,8 @@ Since this functionality is missing but would be greatly appreciated by lecturer
 lecture materials to their courses using the command line, here's a way to make this possible. Note this does not provide the
 CLI commands, it does, however, allow files to be pushed into a section of a course.
 
+![Animation of the process](docs/local_ws_fileassistant.gif)
+
 # Usage #
 
 Given a file exists in a user's "Private files", e.g. pdf1.pdf, the user is able to push it to a Moodle course by the CLI command
