@@ -165,8 +165,9 @@ class local_ws_fileassistant_external extends external_api {
                 if ($file = $fs->get_file($context->id, 'user', 'draft', $tempfile->get_itemid(), '/', $futurefilename)) {
                     $file->delete();
                 }
-                return get_string('successmessage', 'local_ws_fileassistant', array('folder' => $filepath, 'file' => $params['filename'],
-                    'username' => fullname($USER), 'courseid' => $courseid, 'coursesection' => $sectionnumber, 'newname' => $futurefilename, 'resourceid' => $moduleinfo->id));
+                return get_string('successmessage', 'local_ws_fileassistant', array('folder' => $filepath,
+                    'file' => $params['filename'], 'username' => fullname($USER), 'courseid' => $courseid,
+                    'coursesection' => $sectionnumber, 'newname' => $futurefilename, 'resourceid' => $moduleinfo->id));
             }
         }
         throw new moodle_exception('filenotfound');

@@ -38,20 +38,21 @@ class local_fileassistant_testcase  extends advanced_testcase {
      * Test that files can be pushed to a course.
      */
     public function test_push_file_to_course() {
-        global $DB;
+        global $DB, $USER;
 
         $this->resetAfterTest();
         $this->setAdminUser();
 
         $fs = get_file_storage();
+        $context = context_user::instance($USER->id);
 
-        // Add two files to core_privacy::tests::0.
+        // Add two user private files.
         $files = [];
         $file = (object) [
             'component' => 'user',
-            'filearea'  => 'draft',
-            'itemid'    => file_get_unused_draft_itemid(),
-            'author'    => fullname($USER),
+            'filearea' => 'private',
+            'itemid' => file_get_unused_draft_itemid(),
+            'author' => fullname($USER),
             'filepath'  => '/',
             'filename' => 'basepic.jpg',
             'content' => 'Test file 0',
@@ -60,9 +61,9 @@ class local_fileassistant_testcase  extends advanced_testcase {
 
         $file = (object) [
             'component' => 'user',
-            'filearea'  => 'draft',
-            'itemid'    => file_get_unused_draft_itemid(),
-            'author'    => fullname($USER),
+            'filearea' => 'private',
+            'itemid' => file_get_unused_draft_itemid(),
+            'author' => fullname($USER),
             'filepath' => '/assignment/',
             'filename' => 'infolder.jpg',
             'content' => 'Test file 1',
@@ -70,17 +71,15 @@ class local_fileassistant_testcase  extends advanced_testcase {
         $files[] = $file;
 
         foreach ($files as $file) {
-            $record = [
-                'contextid' => $context->id,
-                'component' => $file->component,
-                'filearea'  => $file->filearea,
-                'itemid'    => $file->itemid,
-                'filepath'  => $file->path,
-                'filename'  => $file->name,
-            ];
-
-            $file->namepath = '/' . $file->filearea . '/' . ($file->itemid ?: '') . $file->path . $file->name;
-            $file->storedfile = $fs->create_file_from_string($record, $file->content);
+            $userfilerecord = new stdClass;
+            $userfilerecord->contextid = $context->id;
+            $userfilerecord->component = $file->component;
+            $userfilerecord->filearea = $file->filearea;
+            $userfilerecord->itemid = 0;
+            $userfilerecord->filepath = $file->filepath;
+            $userfilerecord->filename = $file->filename;
+            $userfilerecord->source = 'test';
+            $userfile = $fs->create_file_from_string($userfilerecord, $file->content);
         }
 
         // Test the create_file_resource function.
@@ -96,7 +95,14 @@ class local_fileassistant_testcase  extends advanced_testcase {
             // This should never happen.
             $this->fail('An exception was caught ('.get_class($exception).').');
         }
-        $this->assertEquals(1, $DB->count_records('resource'));
+
+        // Verify the course_module has one resource.
+        $resources = get_coursemodules_in_course('resource', $courseid);
+        $this->assertEquals(1, count($resources));
+
+        // Verify the resource displayname.
+        $cm = array_pop($resources);
+        $this->assertEquals('picture1.jpg', $cm->name);
 
         // Add the 'infolder.jpg' file to the course.
         try {
@@ -107,11 +113,15 @@ class local_fileassistant_testcase  extends advanced_testcase {
             // This should never happen.
             $this->fail('An exception was caught ('.get_class($exception).').');
         }
-        $this->assertEquals(2, $DB->count_records('resource'));
 
         // Verify the course_module has two resources.
-        $cmcount = $DB->count_records('course_modules', ['course' => $courseid]);
-        $this->assertEquals(2, $cmcount);
+        $resources = get_coursemodules_in_course('resource', $courseid);
+        $this->assertEquals(2, count($resources));
 
+        // Verify the resource displayname.
+        $keys = array_keys($resources);
+        $key = $keys[0];
+        $cm = $resources[$key];
+        $this->assertEquals('picture2.jpg', $cm->name);
     }
 }
