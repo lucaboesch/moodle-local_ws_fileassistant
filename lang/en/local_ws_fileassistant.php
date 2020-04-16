@@ -27,3 +27,5 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'File assistant web service';
 $string['local/ws_fileassistant:managefiles'] = 'Manage files using the Fileassistant Web Service';
+$string['successmessage'] = 'Added file {$a->folder}{$a->file} by user {$a->username} to course id {$a->courseid} in section ' .
+    '{$a->coursesection} now having name {$a->newname} and resource id {$a->resourceid}.';

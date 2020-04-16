@@ -33,40 +33,6 @@ require_once($CFG->dirroot . '/local/ws_fileassistant/externallib.php');
  * Class local_fileassistant_testcase
  */
 class local_fileassistant_testcase  extends advanced_testcase {
-    /**
-     * Helper function to create draft files
-     *
-     * @param  array  $filedata data for the file record (to not use defaults)
-     * @return stored_file the stored file instance
-     */
-    public static function create_draft_file($filedata = array()) {
-        global $USER;
-
-        $fs = get_file_storage();
-
-        $filerecord = array(
-            'component' => 'user',
-            'filearea'  => 'draft',
-            'itemid'    => isset($filedata['itemid']) ? $filedata['itemid'] : file_get_unused_draft_itemid(),
-            'author'    => isset($filedata['author']) ? $filedata['author'] : fullname($USER),
-            'filepath'  => isset($filedata['filepath']) ? $filedata['filepath'] : '/',
-            'filename'  => isset($filedata['filename']) ? $filedata['filename'] : 'file.txt',
-        );
-
-        if (isset($filedata['contextid'])) {
-            $filerecord['contextid'] = $filedata['contextid'];
-        } else {
-            $usercontext = context_user::instance($USER->id);
-            $filerecord['contextid'] = $usercontext->id;
-        }
-        $source = isset($filedata['source']) ? $filedata['source'] : serialize((object)array('source' => 'From string'));
-        $content = isset($filedata['content']) ? $filedata['content'] : 'some content here';
-
-        $file = $fs->create_file_from_string($filerecord, $content);
-        $file->set_source($source);
-
-        return $file;
-    }
 
     /**
      * Test that files can be pushed to a course.
@@ -77,38 +43,45 @@ class local_fileassistant_testcase  extends advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
 
-        $filerecord = ['filename' => 'basepic.jpg'];
-        $file = self::create_draft_file($filerecord);
+        $fs = get_file_storage();
 
-        $secondrecord = [
-            'filename' => 'infolder.jpg',
+        // Add two files to core_privacy::tests::0.
+        $files = [];
+        $file = (object) [
+            'component' => 'user',
+            'filearea'  => 'draft',
+            'itemid'    => file_get_unused_draft_itemid(),
+            'author'    => fullname($USER),
+            'filepath'  => '/',
+            'filename' => 'basepic.jpg',
+            'content' => 'Test file 0',
+        ];
+        $files[] = $file;
+
+        $file = (object) [
+            'component' => 'user',
+            'filearea'  => 'draft',
+            'itemid'    => file_get_unused_draft_itemid(),
+            'author'    => fullname($USER),
             'filepath' => '/assignment/',
-            'itemid' => $file->get_itemid()
+            'filename' => 'infolder.jpg',
+            'content' => 'Test file 1',
         ];
-        $file = self::create_draft_file($secondrecord);
+        $files[] = $file;
 
-        $thirdrecord = [
-            'filename' => 'deeperfolder.jpg',
-            'filepath' => '/assignment/pics/',
-            'itemid' => $file->get_itemid()
-        ];
-        $file = self::create_draft_file($thirdrecord);
+        foreach ($files as $file) {
+            $record = [
+                'contextid' => $context->id,
+                'component' => $file->component,
+                'filearea'  => $file->filearea,
+                'itemid'    => $file->itemid,
+                'filepath'  => $file->path,
+                'filename'  => $file->name,
+            ];
 
-        $fourthrecord = [
-            'filename' => 'differentimage.jpg',
-            'filepath' => '/secondfolder/',
-            'itemid' => $file->get_itemid()
-        ];
-        $file = self::create_draft_file($fourthrecord);
-
-        // This record has the same name as the last record, but it's in a different folder.
-        // Just checking this is also returned.
-        $fifthrecord = [
-            'filename' => 'differentimage.jpg',
-            'filepath' => '/assignment/pics/',
-            'itemid' => $file->get_itemid()
-        ];
-        $file = self::create_draft_file($fifthrecord);
+            $file->namepath = '/' . $file->filearea . '/' . ($file->itemid ?: '') . $file->path . $file->name;
+            $file->storedfile = $fs->create_file_from_string($record, $file->content);
+        }
 
         // Test the create_file_resource function.
         $course = self::getDataGenerator()->create_course();
