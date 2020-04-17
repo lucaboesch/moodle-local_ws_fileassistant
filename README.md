@@ -4,8 +4,9 @@ The local_ws_fileassistant Moodle web service helps accomplishing the task to pu
 Moodle course.
 
 Since this functionality is missing but would be greatly appreciated by lecturers who want to create their own scripts to push their
-lecture materials to their courses using the command line, here's a way to make this possible. Note this does not provide the
-CLI commands, it does, however, allow files to be pushed into a section of a course.
+lecture materials to their courses using the command line, here's a way to make this possible.
+
+See below for an example cURL command. More featurful clients are available in the `clients/` subdirectory.
 
 ![Animation of the process](docs/local_ws_fileassistant.gif)
 
