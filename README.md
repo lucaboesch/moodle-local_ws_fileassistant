@@ -6,7 +6,7 @@ Moodle course.
 Since this functionality is missing but would be greatly appreciated by lecturers who want to create their own scripts to push their
 lecture materials to their courses using the command line, here's a way to make this possible.
 
-See below for an example cURL command. More featurful clients are available in the `clients/` subdirectory.
+See below for an example cURL command. More featureful clients are available in the `clients/` subdirectory.
 
 ![Animation of the process](docs/local_ws_fileassistant.gif)
 
