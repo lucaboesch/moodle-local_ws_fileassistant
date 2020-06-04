@@ -38,7 +38,7 @@ class local_fileassistant_testcase  extends advanced_testcase {
      * Test that files can be pushed to a course.
      */
     public function test_push_file_to_course() {
-        global $DB, $USER;
+        global $USER;
 
         $this->resetAfterTest();
         $this->setAdminUser();
@@ -79,7 +79,7 @@ class local_fileassistant_testcase  extends advanced_testcase {
             $userfilerecord->filepath = $file->filepath;
             $userfilerecord->filename = $file->filename;
             $userfilerecord->source = 'test';
-            $userfile = $fs->create_file_from_string($userfilerecord, $file->content);
+            $fs->create_file_from_string($userfilerecord, $file->content);
         }
 
         // Test the create_file_resource function.
