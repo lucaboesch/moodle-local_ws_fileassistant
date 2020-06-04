@@ -120,6 +120,7 @@ class local_fileassistant_testcase  extends advanced_testcase {
 
         // Verify the resource displayname.
         $keys = array_keys($resources);
+        rsort($keys);
         $key = $keys[0];
         $cm = $resources[$key];
         $this->assertEquals('picture2.jpg', $cm->name);
