@@ -12,22 +12,23 @@ fi
 # Assign command-line parameters to named variables
 course=$1
 section=$2
-filename=$3
+filepath=$3
+filename=${filepath##*/}    # Strip directories from path
 displayname=${4:-$filename} # Use filename if display name not specified
 
 # Read Moodle configuration, including secret tokens
 source moodle.config
 
 # Upload the file
-upload_output=$(curl -sS -F "file_1=@${filename}" "https://${moodle_host}/webservice/upload.php?token=${moodle_web_service_token}")
+upload_output=$(curl -sS -F "file_1=@${filepath}" "https://${moodle_host}/webservice/upload.php?token=${moodle_web_service_token}")
 
 # Get uploaded file ID from cURL output
 item_pattern='"itemid":([0-9]+)'
 if [[ "${upload_output}" =~ $item_pattern ]]; then
   uploaded_item=${BASH_REMATCH[1]}
-  echo "Uploaded \"${filename}\" to item ${uploaded_item}"
+  echo "Uploaded \"${filepath}\" to item ${uploaded_item}"
 else
-  echo "Unexpected output for upload of file \"${filename}\": ${upload_output}" >&2
+  echo "Unexpected output for upload of file \"${filepath}\": ${upload_output}" >&2
   exit 1
 fi
 
