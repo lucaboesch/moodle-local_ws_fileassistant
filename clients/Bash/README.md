@@ -14,6 +14,8 @@ To upload the file "test 1.txt" to section 4 of course 22686:
 ./upload2section.sh 22686 4 "test 1.txt"
 ```
 
+The sections are numbered in positional order of the course page, starting from 0.
+
 An additional parameter can be given to specify the display name:
 
 ```
