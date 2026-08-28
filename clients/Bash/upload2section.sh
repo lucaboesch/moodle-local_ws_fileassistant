@@ -5,7 +5,7 @@ set -eu
 
 # If wrong number of parameters was given, show usage message and exit
 if (($# < 3 || $# > 4)); then
-  echo "Usage: ${0##*/} <course ID> <section ID> <filename> [<display name>]" >&2
+  echo "Usage: ${0##*/} <course ID> <section NUMBER> <filename> [<display name>]" >&2
   exit 1
 fi
 
